@@ -1,5 +1,5 @@
 def Price(option_name, parameters, model):
-    optionA = option_name(parameters)
+    optionA = option_name.create(parameters)
     if parameters['type'] == 'dividend yield':
         return optionA.PriceByPath(model(parameters).generate_path_dividend_yield())
     elif parameters['type'] == 'discrete cash dividend':

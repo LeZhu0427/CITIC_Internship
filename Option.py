@@ -1,29 +1,29 @@
 import math
 from scipy.stats import norm
+from dataclasses import dataclass
 
 
+@dataclass(frozen=True)
 class Option:
-    def __init__(self, parameter_dict):
-        self.K = parameter_dict['K']
-        self.T = parameter_dict['T']
-        self.t = parameter_dict['t']
-        self.r = parameter_dict['r']  # annual interest rate
+    K: float
+    T: float
+    t: float
+    cp: float
+    r: float  # annual interest rate
 
-
-class EuropeanOption(Option):
-    def __init__(self, parameter_dict):
-        super().__init__(parameter_dict)
-
-    def payoff(self):
+    def payoff(self, ST: float):
         pass
 
 
-class EuropeanCall(EuropeanOption):
-    def __init__(self, parameter_dict):
-        super().__init__(parameter_dict)
+@dataclass(frozen=True)
+class EuropeanOption(Option):
 
-    def payoff(self, ST):
-        return max(ST - self.K, 0)
+    @classmethod
+    def create(cls, param: dict):
+        return cls(K=param['K'], T=param['T'], t=param['t'], r=param['r'], cp=1.0)
+
+    def payoff(self, ST: float):
+        return max(self.cp * (ST - self.K), 0.0)
 
     def PriceByPath(self, path):
         payoff = 0
@@ -38,7 +38,7 @@ class EuropeanCall(EuropeanOption):
         vol = parameter_dict['vol']
         if self.K > 0:
             d1 = (math.log(S0 / self.K) + (self.r - q + 0.5 * vol * vol) * (self.T - self.t) / 360) / (
-                        vol * math.sqrt((self.T - self.t) / 360))
+                    vol * math.sqrt((self.T - self.t) / 360))
             d2 = d1 - vol * math.sqrt((self.T - self.t) / 360)
             return S0 * norm.cdf(d1) - self.K * math.exp(-self.r * (self.T - self.t) / 360) * norm.cdf(d2)
         else:
@@ -61,18 +61,17 @@ class EuropeanCall(EuropeanOption):
         return fv * df
 
 
+@dataclass(frozen=True)
 class BarrierOption(Option):
-    def __init__(self, parameter_dict):
-        super().__init__(parameter_dict)
-        self.B = parameter_dict['B']  # barrier level
+    B: float
 
-    def payoff(self):
-        pass
+    @classmethod
+    def create(cls, param: dict):
+        return cls(K=param['K'], T=param['T'], t=param['t'], cp=1.0, r=param['r'], B=param['B'])
 
 
+@dataclass(frozen=True)
 class UpandOutCall(BarrierOption):
-    def __init__(self, parameter_dict):
-        super().__init__(parameter_dict)
 
     def payoff(self, ST):
         return max(ST - self.K, 0)

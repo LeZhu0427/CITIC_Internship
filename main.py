@@ -1,11 +1,11 @@
 # This is a sample Python script.
-
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 from Option import *
 from PricingModel import *
 from Price import Price
+
 
 delta = 0.01
 d = delta * 100 * math.exp(0.01 / 360 * 180)
@@ -17,8 +17,8 @@ parameter1 = {'S0': 100, 'K': 100, 'T': 360, 't': 0, 'vol': 0.1, 'r': 0.01, 'div
               "type": 'dividend yield', 'frequency': 252}  # annual dividend rate (compounded)
 parameter11 = {'S0': 100, 'K': 0, 'T': 360, 't': 0, 'vol': 0.1, 'r': 0.01, 'dividend': divdend1,
                "type": 'dividend yield', 'frequency': 252}  # annual dividend rate (compounded)
-print("European call with dividend yield : ", Price(EuropeanCall, parameter1, Monte_Carlo))
-print("Forward with dividend yield : ", Price(EuropeanCall, parameter11, Monte_Carlo))
+print("European call with dividend yield : ", Price(EuropeanOption, parameter1, Monte_Carlo))
+print("Forward with dividend yield : ", Price(EuropeanOption, parameter11, Monte_Carlo))
 
 divdend2 = np.zeros(360)
 divdend2[179] = d  # d = S0*e^(rt)*delta
@@ -26,8 +26,8 @@ parameter2 = {'S0': 100, 'K': 100, 'T': 360, 't': 0, 'vol': 0.1, 'r': 0.01, 'div
               "type": 'discrete cash dividend', 'frequency': 252}  # annual dividend rate (compounded)
 parameter22 = {'S0': 100, 'K': 0, 'T': 360, 't': 0, 'vol': 0.1, 'r': 0.01, 'dividend': divdend2,
                "type": 'discrete cash dividend', 'frequency': 252}  # annual dividend rate (compounded)
-print("European call with discrete cash dividend: ", Price(EuropeanCall, parameter2, Monte_Carlo))
-print("Forward with discrete cash dividend: ", Price(EuropeanCall, parameter22, Monte_Carlo))
+print("European call with discrete cash dividend: ", Price(EuropeanOption, parameter2, Monte_Carlo))
+print("Forward with discrete cash dividend: ", Price(EuropeanOption, parameter22, Monte_Carlo))
 
 divdend3 = np.zeros(360)
 divdend3[179] = delta
@@ -35,8 +35,8 @@ parameter3 = {'S0': 100, 'K': 100, 'T': 360, 't': 0, 'vol': 0.1, 'r': 0.01, 'div
               "type": 'discrete proportional dividend', 'frequency': 252}  # annual dividend rate (proportional)
 parameter33 = {'S0': 100, 'K': 0, 'T': 360, 't': 0, 'vol': 0.1, 'r': 0.01, 'dividend': divdend3,
                "type": 'discrete proportional dividend', 'frequency': 252}  # annual dividend rate (proportional)
-print("European call with discrete proportional dividend: ", Price(EuropeanCall, parameter3, Monte_Carlo))
-print("Forward with discrete proportional dividend: ", Price(EuropeanCall, parameter33, Monte_Carlo))
+print("European call with discrete proportional dividend: ", Price(EuropeanOption, parameter3, Monte_Carlo))
+print("Forward with discrete proportional dividend: ", Price(EuropeanOption, parameter33, Monte_Carlo))
 
 '''
 self.n_path = 100000
