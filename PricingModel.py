@@ -1,5 +1,6 @@
 import numpy as np
 import math
+from numpy.random import mtrand
 
 
 class PricingModel:
@@ -27,6 +28,11 @@ class Monte_Carlo(PricingModel):
         super().__init__(parameter_dict)
 
     # def plot_path(self):
+
+    def generate_discrete_data(self):
+        self.path = np.ones((1, self.n_path)) * self.S0  # row 0: S0
+        self.ST = np.ones(self.n_path) * self.S0  # S0
+        self.Wt = np.random.normalmtrand.RandomState(seed=42).randn(self.n_path, self.T - self.t)
 
     def generate_path_dividend_yield(self):
         self.ST = np.array([self.S0] * self.n_path)  # S0
