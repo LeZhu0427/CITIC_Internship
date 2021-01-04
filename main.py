@@ -7,6 +7,7 @@ from PricingModel import *
 from Price import Price
 
 #test commit
+# test merge
 delta = 0.01
 d = delta * 100 * math.exp(0.01 / 360 * 180)
 q = -math.log(1 - delta) / 360
