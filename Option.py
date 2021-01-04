@@ -36,13 +36,10 @@ class EuropeanOption(Option):
         S0 = parameter_dict['S0']
         q = parameter_dict['dividend']
         vol = parameter_dict['vol']
-        if self.K > 0:
-            d1 = (math.log(S0 / self.K) + (self.r - q + 0.5 * vol * vol) * (self.T - self.t) / 360) / (
-                    vol * math.sqrt((self.T - self.t) / 360))
-            d2 = d1 - vol * math.sqrt((self.T - self.t) / 360)
-            return S0 * norm.cdf(d1) - self.K * math.exp(-self.r * (self.T - self.t) / 360) * norm.cdf(d2)
-        else:
-            return S0 * math.exp(-sum(q) * (self.T - self.t) / 360)
+        year_frac = (self.T - self.t) / 360.0
+        fwd = S0 * math.exp((self.r - q) * year_frac)
+        df = math.exp(- self.r * year_frac)
+        return EuropeanOption.Black73(cp=self.cp, fwd=fwd, strk=self.K, vol=vol, year_frac=year_frac, df=df)
 
     @staticmethod
     def Black73(cp: float = 1.0, fwd: float = 1.0, strk: float = 1.0, vol: float = 1.0, year_frac=1.0,
