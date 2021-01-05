@@ -1,6 +1,15 @@
 import math
 from scipy.stats import norm
 from dataclasses import dataclass
+from MarketData import MarketData
+from enum import Enum, unique, auto
+
+
+@unique
+class OptionType(Enum):
+    Forward = auto()
+    European = auto()
+    UpandOutCall = auto()
 
 
 @dataclass(frozen=True)
@@ -9,37 +18,46 @@ class Option:
     T: float
     t: float
     cp: float
-    r: float  # annual interest rate
+
+    @staticmethod
+    def option_type():
+        pass
 
     def payoff(self, ST: float):
+        pass
+
+    def PriceByPath(self, path: dict):
+        pass
+
+    def PriceByBS(self, market: MarketData):
         pass
 
 
 @dataclass(frozen=True)
 class EuropeanOption(Option):
 
+    @staticmethod
+    def option_type():
+        return OptionType.European.name
+
     @classmethod
     def create(cls, param: dict):
-        return cls(K=param['K'], T=param['T'], t=param['t'], r=param['r'], cp=1.0)
+        return cls(K=param['K'], T=param['T'], t=param['t'], cp=1.0)
 
     def payoff(self, ST: float):
         return max(self.cp * (ST - self.K), 0.0)
 
-    def PriceByPath(self, path):
+    def PriceByPath(self, path_variable: dict):
         payoff = 0
-        for i in range(len(path)):
-            payoff += self.payoff(path[i])
-        return payoff / len(path) * math.exp(
-            -self.r * (self.T - self.t) / 252)  # matching discouting method with divident?
+        for i in range(len(path_variable['path'])):
+            payoff += self.payoff(path_variable['path'][i])
+        return payoff / len(path_variable['path']) * path_variable['df']
 
-    def PriceByBS(self, parameter_dict):
-        S0 = parameter_dict['S0']
-        q = parameter_dict['dividend']
-        vol = parameter_dict['vol']
+    def PriceByBS(self, market: MarketData):
         year_frac = (self.T - self.t) / 360.0
-        fwd = S0 * math.exp((self.r - q) * year_frac)
-        df = math.exp(- self.r * year_frac)
-        return EuropeanOption.Black73(cp=self.cp, fwd=fwd, strk=self.K, vol=vol, year_frac=year_frac, df=df)
+        fwd = market.spot * math.exp((market.r - market.q) * year_frac)
+        df = math.exp(- market.r * year_frac)
+        return EuropeanOption.Black73(cp=self.cp, fwd=fwd, strk=self.K, vol=market.vol, year_frac=year_frac, df=df)
 
     @staticmethod
     def Black73(cp: float = 1.0, fwd: float = 1.0, strk: float = 1.0, vol: float = 1.0, year_frac=1.0,
@@ -59,21 +77,32 @@ class EuropeanOption(Option):
 
 
 @dataclass(frozen=True)
+class Forward(EuropeanOption):
+
+    @staticmethod
+    def option_type():
+        return OptionType.Forward.name
+
+@dataclass(frozen=True)
 class BarrierOption(Option):
     B: float
 
     @classmethod
     def create(cls, param: dict):
-        return cls(K=param['K'], T=param['T'], t=param['t'], cp=1.0, r=param['r'], B=param['B'])
+        return cls(K=param['K'], T=param['T'], t=param['t'], cp=1.0, B=param['B'])
 
 
 @dataclass(frozen=True)
 class UpandOutCall(BarrierOption):
 
-    def payoff(self, ST):
-        return max(ST - self.K, 0)
+    @staticmethod
+    def option_type():
+        return OptionType.UpandOutCall.name
 
-    def PriceByPath(self, path):
+    def payoff(self, ST: float):
+        return max(ST - self.K, 0.0)
+
+    def PriceByPath(self, path_variable: dict):
         '''payoff=0
         for i in range(len(path[-1])):
             payoff_i = self.payoff(path[-1][i])
@@ -81,6 +110,6 @@ class UpandOutCall(BarrierOption):
                 payoff += payoff_i
         return payoff/len(path[-1])*math.exp(-self.r*(self.T-self.t)/252)'''
         payoff = 0
-        for i in range(len(path)):
-            payoff += self.payoff(path[i])
-        return payoff / len(path) * math.exp(-self.r * (self.T - self.t) / 252)
+        for i in range(len(path_variable['path'])):
+            payoff += self.payoff(path_variable['path'][i])
+        return payoff / len(path_variable['path']) * path_variable['df']

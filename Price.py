@@ -1,16 +1,21 @@
 import math
 import numpy as np
+from Option import Option
+from PricingModel import PricingModel, ModelType
+from MarketData import MarketData, DividendType
 
-def Price(option_name, parameters, model):
-    option = option_name.create(parameters)
-    if 'q' not in parameters.keys():
-        parameters['q'] = np.zeros(parameters['T']-parameters['t'])
-    if 'd' not in parameters.keys():
-        parameters['d'] = np.zeros(parameters['T'] - parameters['t'])
-    if 'delta' not in parameters.keys():
-        parameters['delta'] = np.zeros(parameters['T'] - parameters['t'])
-    return option.PriceByPath(model.generate_ST(S0=parameters['S0'], vol=parameters['vol'], r=parameters['r']/360,
-                              T=parameters['T'], t=parameters['t'], d=parameters['d'], q=parameters['q'], delta=parameters['delta']))
+
+def Price(option: Option, market: MarketData, model: PricingModel, print_details: bool = True):
+    if model.model_type() == ModelType.MonteCarlo:
+        result = option.PriceByPath(model.generate_ST(S0=market.spot, vol=market.vol, r=market.r / 360,
+                                                    T=option.T, t=option.t, d=market.d, q=market.q,
+                                                    delta=market.delta))
+    elif model.model_type() == ModelType.Analytic:
+        result = option.PriceByBS(market)
+    else:
+        raise NotImplementedError
+    if print_details:
+        print(option.option_type(), model.model_type(), market.div_type, result)
 
 
 '''def Price(option_name, parameters, model):
