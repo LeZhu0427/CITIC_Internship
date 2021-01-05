@@ -9,13 +9,14 @@ def Price(option: Option, market: MarketData, model: PricingModel, print_details
     if model.model_type() == ModelType.MonteCarlo:
         result = option.PriceByPath(model.generate_ST(S0=market.spot, vol=market.vol, r=market.r / 360,
                                                     T=option.T, t=option.t, d=market.d, q=market.q,
-                                                    delta=market.delta))
+                                                    delta=market.delta, frequency=market.frequency))
     elif model.model_type() == ModelType.Analytic:
         result = option.PriceByBS(market)
     else:
         raise NotImplementedError
     if print_details:
         print(option.option_type(), model.model_type(), market.div_type, result)
+    return result
 
 
 '''def Price(option_name, parameters, model):
