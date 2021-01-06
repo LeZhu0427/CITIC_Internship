@@ -60,19 +60,23 @@ class MonteCarlo(PricingModel):
     def generate_ST(self, S0, vol, r, T, t, d, q, delta, frequency):
         n_timestep = T - t
         q1 = np.ones(n_timestep) * q
+
         d1 = np.zeros(n_timestep)
         delta1 = np.zeros(n_timestep)
         if frequency!=0:
             dt = 360//frequency
             if d is not None:
                 d1[dt-1::dt] = np.ones(len(d1[dt-1::dt])) * d
+                #print(d1)
             if delta is not None:
                 delta1[dt-1::dt] = np.ones(len(delta1[dt-1::dt])) * delta/frequency
+                #print('delta',delta)
         ST = np.array([S0] * self.n_path)  # S0
         for i in range(0, T - t):
             dS = ST * (np.ones(self.n_path) * (r - q1[i]) + vol * self.Wt[i:i + self.n_path]) - np.ones(self.n_path) * d1[
                 i]  # daily increment
             ST = (ST + dS) * (1 - delta1[i])  # discrete proportional dividend is paid at market close
+            #ST = S0 * math.exp()
             if min(ST) < 0:
                 print("cash divident: S", i, "<0")  # it the stock price is negative after paying dividend
         # TODO: contradicting basis
