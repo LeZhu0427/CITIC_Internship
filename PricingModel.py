@@ -67,7 +67,7 @@ class MonteCarlo(PricingModel):
             if d is not None:
                 d1[dt-1::dt] = np.ones(len(d1[dt-1::dt])) * d
             if delta is not None:
-                delta1[dt-1::dt] = np.ones(len(delta1[dt-1::dt])) * delta
+                delta1[dt-1::dt] = np.ones(len(delta1[dt-1::dt])) * delta/frequency
         ST = np.array([S0] * self.n_path)  # S0
         for i in range(0, T - t):
             dS = ST * (np.ones(self.n_path) * (r - q1[i]) + vol * self.Wt[i:i + self.n_path]) - np.ones(self.n_path) * d1[

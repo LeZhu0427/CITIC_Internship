@@ -43,6 +43,7 @@ class MarketData:
 
     def div_convert(self, div_amount: float, frequency: int, fr_type: DividendType, to_type: DividendType) -> float:
         # frequency: number of payment per year
+        # dividend_amount
         if fr_type == to_type:
             return div_amount
         elif fr_type == DividendType.ContinuousYield and to_type == DividendType.DiscreteCash:
@@ -54,7 +55,7 @@ class MarketData:
                 return 0
             else:
                 dt = frequency/360
-                return div_amount * self.spot * math.exp(self.r * dt)
+                return div_amount/frequency * self.spot * math.exp(self.r * dt)
             #delta * S0 * math.exp(r / i)
         elif fr_type == DividendType.DiscreteProp and to_type == DividendType.ContinuousYield:
             # TODO: remove hard code

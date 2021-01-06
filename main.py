@@ -104,7 +104,7 @@ np.save('proportional_dividend.npy',proportional_dividend)'''
 
 # TODO: update this part
 #
-frequency = [1,2,4,12,24,48,360]        # frequency n times per year
+frequency = [1,2,4,12,24,48,52,104,180,360]        # frequency n times per year
 dividend_yield_freq=[]
 cash_dividend_freq=[]
 proportional_dividend_freq=[]
@@ -113,13 +113,14 @@ dividend_yield_forward=[]
 cash_dividend_forward=[]
 proportional_dividend_forward=[]
 
+delta_annual = 0.01
 K = 100
 T = 360
 t = 0
 n_path = 100000
 for i in frequency:
     print('frequency: ', i)
-    delta_annual = 0.01/i
+    #delta_annual = 0.01/i
 
     market.set_div(div_amount=delta_annual, frequency=180, div_type=DividendType.ContinuousYield)
 
