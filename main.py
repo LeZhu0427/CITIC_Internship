@@ -103,8 +103,7 @@ np.save('proportional_dividend.npy',proportional_dividend)'''
 '''
 
 # TODO: update this part
-#
-frequency = [1,2,4,12,24,48,52,104,180,360]        # frequency n times per year
+frequency = [1,2,4,12,24,180,360]     # frequency n times per year
 dividend_yield_freq=[]
 cash_dividend_freq=[]
 proportional_dividend_freq=[]
@@ -118,6 +117,34 @@ K = 100
 T = 360
 t = 0
 n_path = 100000
+'''for i in frequency:
+
+    market.set_div(div_amount=delta_annual, frequency=180, div_type=DividendType.ContinuousYield)
+    option = EuropeanOption(K=K, T=T, t=t, cp=1)
+    forward = Forward(K=0.0, T=T, t=t, cp=1)
+    model = MonteCarlo(n_path, t, T)
+
+
+    market.reset_div()
+    market.set_div(div_amount=delta, frequency=i, div_type=DividendType.DiscreteProp)
+    C3 = Price(option, market, model)
+    F3 = Price(forward, market, model)
+
+    proportional_dividend_freq.append(C3)
+    proportional_dividend_forward.append(F3)
+
+
+plt.plot(frequency, proportional_dividend_freq, label='proportional_dividend')
+plt.legend()
+plt.xlabel('dividend frequency')
+plt.ylabel('European call price')
+plt.show()
+
+plt.plot(frequency, proportional_dividend_forward, label='proportional_dividend_forward')
+plt.legend()
+plt.xlabel('dividend frequency')
+plt.ylabel('forward price')
+plt.show()'''
 for i in frequency:
     print('frequency: ', i)
     #delta_annual = 0.01/i

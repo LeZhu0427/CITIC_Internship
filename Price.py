@@ -18,13 +18,3 @@ def Price(option: Option, market: MarketData, model: PricingModel, print_details
         print(option.option_type(), model.model_type(), market.div_type, result)
     return result
 
-
-'''def Price(option_name, parameters, model):
-    optionA = option_name.create(parameters)
-    if parameters['type'] == 'dividend yield':
-        return optionA.PriceByPath(model(parameters).generate_path_dividend_yield())
-    elif parameters['type'] == 'discrete cash dividend':
-        return optionA.PriceByPath(model(parameters).generate_path_discrete_cash_dividend())
-    # discrete proportional dividend
-    else:
-        return optionA.PriceByPath(model(parameters).generate_path_discrete_proportional_dividend())'''

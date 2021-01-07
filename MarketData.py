@@ -52,15 +52,16 @@ class MarketData:
             # TODO: remove hard code
             #return div_amount * self.spot * math.exp(self.r / 360 * 180)
             if frequency == 0:
-                return 0
+                return 0.0
+                #return None
             else:
-                dt = frequency/360
+                #dt = frequency/360
                 #return div_amount/frequency * self.spot * math.exp(self.r * dt)
                 return self.spot * (1 - pow(1 - div_amount/frequency, frequency)) / (1 - math.exp(-self.r*1)) * (math.exp(self.r/frequency)-1)
-            #delta * S0 * math.exp(r / i)
         elif fr_type == DividendType.DiscreteProp and to_type == DividendType.ContinuousYield:
             # TODO: remove hard code
             if frequency == 0:
-                return 0
+                return 0.0
+                #return None
             else:
-                return -frequency * math.log(1 - div_amount/frequency) / 360
+                return - frequency * math.log(1 - div_amount/frequency) / 360

@@ -18,23 +18,6 @@ class PricingModel:
     def generate_ST(self, **kwargs):
         pass
 
-    '''self.n_path = 100000
-    self.T = parameter_dict['T']  # expire time (unit: days)
-    self.t = parameter_dict['t']  # start time (unit: days)
-    self.S0 = parameter_dict['S0']
-    self.vol = parameter_dict['vol']
-    self.r = parameter_dict['r'] / 360  # daily interest rate
-    self.dividend = parameter_dict['dividend']
-    self.frequency = parameter_dict['frequency']
-    self.path = np.array([[self.S0] * self.n_path])  # row 0: S0
-    np.random.seed(42)
-    self.Wt = np.random.normal(0, 1/math.sqrt(360), self.n_path * (self.T - self.t))     # common random numbers, size: self.n_path * _time_step
-    self.ST = np.array([self.S0] * self.n_path)
-    self.if_barrier = 'B' in parameter_dict.keys()  # if it is a barrier option
-    if self.if_barrier:
-        self.B = parameter_dict['B']'''
-
-
 class Analytic(PricingModel):
     @staticmethod
     def model_type():
@@ -47,15 +30,16 @@ class MonteCarlo(PricingModel):
         np.random.seed(42)
         self.Wt = np.random.normal(0, 1 / math.sqrt(360),
                                    n_path * (T - t))  # common random numbers, size: self.n_path * _time_step
+        #np.random.normalmtrand.RandomState(seed=42).randn(self.n_path, self.T - self.t)
 
     @staticmethod
     def model_type():
         return ModelType.MonteCarlo
 
-    # def generate_discrete_data(self):
-    #     self.path = np.ones((1, self.n_path)) * self.S0  # row 0: S0
-    #     self.ST = np.ones(self.n_path) * self.S0  # S0
-    #     self.Wt = np.random.normalmtrand.RandomState(seed=42).randn(self.n_path, self.T - self.t)
+    def generate_discrete_data(self):
+        self.path = np.ones((1, self.n_path)) * self.S0  # row 0: S0
+        self.ST = np.ones(self.n_path) * self.S0  # S0
+        self.Wt = np.random.normalmtrand.RandomState(seed=42).randn(self.n_path, self.T - self.t)
 
     def generate_ST(self, S0, vol, r, T, t, d, q, delta, frequency):
         n_timestep = T - t
@@ -66,21 +50,25 @@ class MonteCarlo(PricingModel):
         if frequency!=0:
             dt = 360//frequency
             if d is not None:
-                d1[dt-1::dt] = np.ones(len(d1[dt-1::dt])) * d
-                #print(d1)
+                for j in range(1,frequency+1):
+                    d1[j*dt-1] = d
+                #print('frequency cash', frequency, sum(d1))
+                #d1[dt-1::dt] = np.ones(len(d1[dt-1::dt])) * d
             if delta is not None:
-                delta1[dt-1::dt] = np.ones(len(delta1[dt-1::dt])) * delta/frequency
-                #print('delta',delta)
+                #delta1[dt-1::dt] = np.ones(len(delta1[dt-1::dt])) * delta/frequency
+                for j in range(1,frequency+1):
+                    delta1[j*dt-1] = delta / frequency
+                #print('frequency delta', frequency, sum(delta1))
         ST = np.array([S0] * self.n_path)  # S0
         for i in range(0, T - t):
             dS = ST * (np.ones(self.n_path) * (r - q1[i]) + vol * self.Wt[i:i + self.n_path]) - np.ones(self.n_path) * d1[
                 i]  # daily increment
             ST = (ST + dS) * (1 - delta1[i])  # discrete proportional dividend is paid at market close
-            #ST = S0 * math.exp()
             if min(ST) < 0:
                 print("cash divident: S", i, "<0")  # it the stock price is negative after paying dividend
         # TODO: contradicting basis
-        df = math.exp(-r * 360 * (T - t) / 252)  # matching discouting method with divident?
+        #df = math.exp(-r * 360 * (T - t) / 252)  # matching discouting method with dividend?
+        df = math.exp(-r * 360 * (T - t) / 360)  # matching discouting method with dividend?
         return {'path': ST, 'df': df}
 
     '''def generate_path_dividend_yield(self):
