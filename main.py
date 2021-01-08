@@ -6,7 +6,6 @@ from Option import *
 from PricingModel import *
 from Price import Price
 from MarketData import MarketData, DividendType
-
 import matplotlib.pyplot as plt
 
 S0 = 100
@@ -14,6 +13,7 @@ vol = 0.1
 r = 0.01
 market = MarketData(spot=S0, vol=vol, r=r)
 delta = 0.01
+
 # TODO: this div amount is inconsistent with the rest
 '''market.set_div(div_amount=0.01, div_type=DividendType.ContinuousYield)
 
@@ -55,10 +55,13 @@ T = 360
 t = 0
 option = EuropeanOption(K=K, T=T, t=t, cp=1)
 forward = Forward(K=0.0, T=T, t=t, cp=1)
+
 n_path = 100000
 model = MonteCarlo(n_path, t, T)
 
 Price(option, market, Analytic())
+
+# dividend yield
 market.reset_div()
 dividend1 = market.div_convert(div_amount=delta, frequency=1, fr_type=DividendType.DiscreteProp,
                                to_type=DividendType.ContinuousYield)
@@ -66,6 +69,7 @@ market.set_div(div_amount=dividend1, frequency=1, div_type=DividendType.Continuo
 Price(option, market, model)
 Price(forward, market, model)
 
+# discrete cash
 market.reset_div()
 d = market.div_convert(div_amount=delta, frequency=1, fr_type=DividendType.DiscreteProp, to_type=DividendType.DiscreteCash)
 '''dividend2 = np.zeros(360)
@@ -74,6 +78,21 @@ market.set_div(div_amount=d, frequency=1, div_type=DividendType.DiscreteCash)
 Price(option, market, model)
 Price(forward, market, model)
 
+# discrete cash model 1
+market.reset_div()
+d = market.div_convert(div_amount=delta, frequency=1, fr_type=DividendType.DiscreteProp, to_type=DividendType.DiscreteCash_m1)
+market.set_div(div_amount=d, frequency=1, div_type=DividendType.DiscreteCash_m1)
+Price(option, market, model)
+Price(forward, market, model)
+
+# discrete cash model 2
+market.reset_div()
+d = market.div_convert(div_amount=delta, frequency=1, fr_type=DividendType.DiscreteProp, to_type=DividendType.DiscreteCash_m2)
+market.set_div(div_amount=d, frequency=1, div_type=DividendType.DiscreteCash_m2)
+Price(option, market, model)
+Price(forward, market, model)
+
+# discrete proportional
 market.reset_div()
 '''dividend3 = np.zeros(360)
 dividend3[179] = delta'''
@@ -82,69 +101,26 @@ Price(option, market, model)
 Price(forward, market, model)
 
 # compare ATM European call in 3 dividends
-'''dividend_yield=[]
-cash_dividend=[]
-proportional_dividend=[]
-for i in range(10):
-    model = Monte_Carlo(n_path, t, T)
-    dividend_yield.append(Price(EuropeanOption, parameter1, model))
-    cash_dividend.append(Price(EuropeanOption, parameter2, model))
-    proportional_dividend.append(Price(EuropeanOption, parameter3, model))
-print(dividend_yield)
-print(cash_dividend)
-print(proportional_dividend)
-np.save('dividend_yield.npy',dividend_yield)
-np.save('cash_dividend.npy',cash_dividend)
-np.save('proportional_dividend.npy',proportional_dividend)'''
-'''
-[3.5185041097852836, 4.266686487515944, 3.7187056542625507, 3.9249722998030916, 4.02103191291618, 3.875374929919656, 3.5985177608681793, 3.509104025231723, 3.2987225916479375, 3.7781256088716235]
-[3.53584422670298, 4.2884599458044175, 3.737630628467244, 3.9445852689972596, 4.041509661070356, 3.894441381521445, 3.6164796459644437, 3.526521218530505, 3.315318658524736, 3.796416929005649]
-[3.51839988402595, 4.266559512887719, 3.7185947021463206, 3.9248556109400514, 4.020912421135638, 3.8752597134790467, 3.598410951485733, 3.5090002444470465, 3.2986249805040715, 3.7780136177820647]
-'''
-
 # TODO: update this part
 frequency = [1,2,4,12,24,180,360]     # frequency n times per year
 dividend_yield_freq=[]
 cash_dividend_freq=[]
 proportional_dividend_freq=[]
+cash_dividend_m1_freq=[]
+cash_dividend_m2_freq=[]
 
 dividend_yield_forward=[]
 cash_dividend_forward=[]
 proportional_dividend_forward=[]
+cash_dividend_m1_forward=[]
+cash_dividend_m2_forward=[]
 
 delta_annual = 0.01
 K = 100
 T = 360
 t = 0
 n_path = 100000
-'''for i in frequency:
 
-    market.set_div(div_amount=delta_annual, frequency=180, div_type=DividendType.ContinuousYield)
-    option = EuropeanOption(K=K, T=T, t=t, cp=1)
-    forward = Forward(K=0.0, T=T, t=t, cp=1)
-    model = MonteCarlo(n_path, t, T)
-
-
-    market.reset_div()
-    market.set_div(div_amount=delta, frequency=i, div_type=DividendType.DiscreteProp)
-    C3 = Price(option, market, model)
-    F3 = Price(forward, market, model)
-
-    proportional_dividend_freq.append(C3)
-    proportional_dividend_forward.append(F3)
-
-
-plt.plot(frequency, proportional_dividend_freq, label='proportional_dividend')
-plt.legend()
-plt.xlabel('dividend frequency')
-plt.ylabel('European call price')
-plt.show()
-
-plt.plot(frequency, proportional_dividend_forward, label='proportional_dividend_forward')
-plt.legend()
-plt.xlabel('dividend frequency')
-plt.ylabel('forward price')
-plt.show()'''
 for i in frequency:
     print('frequency: ', i)
     #delta_annual = 0.01/i
@@ -170,6 +146,22 @@ for i in frequency:
     C2 = Price(option, market, model)
     F2 = Price(forward, market, model)
 
+    # discrete cash model 1
+    market.reset_div()
+    d = market.div_convert(div_amount=delta, frequency=i, fr_type=DividendType.DiscreteProp,
+                           to_type=DividendType.DiscreteCash_m1)
+    market.set_div(div_amount=d, frequency=i, div_type=DividendType.DiscreteCash_m1)
+    C21 = Price(option, market, model)
+    F21 = Price(forward, market, model)
+
+    # discrete cash model 2
+    market.reset_div()
+    d = market.div_convert(div_amount=delta, frequency=i, fr_type=DividendType.DiscreteProp,
+                           to_type=DividendType.DiscreteCash_m2)
+    market.set_div(div_amount=d, frequency=i, div_type=DividendType.DiscreteCash_m2)
+    C22 = Price(option, market, model)
+    F22 = Price(forward, market, model)
+
     market.reset_div()
     market.set_div(div_amount=delta, frequency=i, div_type=DividendType.DiscreteProp)
     C3 = Price(option, market, model)
@@ -179,18 +171,28 @@ for i in frequency:
 
     dividend_yield_freq.append(C1)
     cash_dividend_freq.append(C2)
+    cash_dividend_m1_freq.append(C21)
+    cash_dividend_m2_freq.append(C22)
     proportional_dividend_freq.append(C3)
 
     dividend_yield_forward.append(F1)
     cash_dividend_forward.append(F2)
+    cash_dividend_m1_forward.append(F21)
+    cash_dividend_m2_forward.append(F22)
     proportional_dividend_forward.append(F3)
 
 np.save('./results/frequency.npy', frequency)
 np.save('./results/dividend_yield_freq.npy', dividend_yield_freq)
 np.save('./results/cash_dividend_freq.npy', cash_dividend_freq)
+np.save('./results/cash_dividend_m1_freq.npy', cash_dividend_freq)
+np.save('./results/cash_dividend_m2_freq.npy', cash_dividend_freq)
 np.save('./results/proportional_dividend_freq.npy', proportional_dividend_freq)
+
+plt.axis([-1,370,3,6])
 plt.plot(frequency, dividend_yield_freq, label='dividend_yield')
 plt.plot(frequency, cash_dividend_freq, label='cash_dividend')
+plt.plot(frequency, cash_dividend_m1_freq, label='cash_dividend_m1')
+plt.plot(frequency, cash_dividend_m2_freq, label='cash_dividend_m2')
 plt.plot(frequency, proportional_dividend_freq, label='proportional_dividend')
 plt.legend()
 plt.xlabel('dividend frequency')
@@ -200,9 +202,15 @@ plt.show()
 
 np.save('./results/dividend_yield_forward.npy', dividend_yield_forward)
 np.save('./results/cash_dividend_forward.npy', cash_dividend_forward)
+np.save('./results/cash_dividend_m1_forward.npy', cash_dividend_forward)
+np.save('./results/cash_dividend_m2_forward.npy', cash_dividend_forward)
 np.save('./results/proportional_dividend_forward.npy', proportional_dividend_forward)
+
+plt.axis([-1,370,95,105])
 plt.plot(frequency, dividend_yield_forward, label='dividend_yield_forward')
 plt.plot(frequency, cash_dividend_forward, label='cash_dividend_forward')
+plt.plot(frequency, cash_dividend_m1_forward, label='cash_dividend_m1_forward')
+plt.plot(frequency, cash_dividend_m2_forward, label='cash_dividend_m2_forward')
 plt.plot(frequency, proportional_dividend_forward, label='proportional_dividend_forward')
 plt.legend()
 plt.xlabel('dividend frequency')
@@ -212,10 +220,16 @@ plt.show()
 
 print(dividend_yield_freq)
 print(cash_dividend_freq)
+print(cash_dividend_m1_freq)
+print(cash_dividend_m2_freq)
 print(proportional_dividend_freq)
 print(dividend_yield_forward)
 print(cash_dividend_forward)
+print(cash_dividend_m1_forward)
+print(cash_dividend_m2_forward)
 print(proportional_dividend_forward)
+
+
 '''
 # [3.9424289966357033, 4.21623893697899, 4.356583873411636, 4.451563121902687, 4.4755012591324395, 4.487500311199823, 4.497915066989274]
 # [3.9821585316279577, 3.973347544683029, 3.9690642989938034, 3.9661751823207125, 3.9654580005882045, 3.963575144635045, 3.964785179264228]
