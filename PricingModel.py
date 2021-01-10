@@ -61,12 +61,13 @@ class MonteCarlo(PricingModel):
             elif d_model1 is not None:
                 discount_PV = 0
                 for j in range(1, frequency + 1):
-                    discount_PV += math.exp(-r * (j + 1) * dt)
+                    discount_PV += math.exp(-r * j * dt)
                 ST = np.array([S0 - d_model1 * discount_PV] * self.n_path)  # S0
             elif d_model2 is not None:
                 dividend_FV = 0
                 for j in range(1, frequency + 1):
-                    dividend_FV += math.exp(-r * (j + 1) * dt)
+                    #dividend_FV += math.exp(-r * (j + 1) * dt)
+                    dividend_FV += math.exp(r * (1 - j * dt))
                 dividend_FV = dividend_FV * d_model2 * math.exp(r * (T - t))
 
         for i in range(0, T - t):
