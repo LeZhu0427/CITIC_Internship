@@ -15,39 +15,6 @@ market = MarketData(spot=S0, vol=vol, r=r)
 delta = 0.01
 
 # TODO: this div amount is inconsistent with the rest
-'''market.set_div(div_amount=0.01, div_type=DividendType.ContinuousYield)
-
-K = 100
-T = 360
-t = 0
-option = EuropeanOption(K=K, T=T, t=t, cp=1)
-forward = Forward(K=0.0, T=T, t=t, cp=1)
-n_path = 100000
-model = MonteCarlo(n_path, t, T)
-
-Price(option, market, Analytic())
-market.reset_div()
-dividend1 = market.div_convert(div_amount=delta, fr_type=DividendType.DiscreteProp,
-                               to_type=DividendType.ContinuousYield)
-market.set_div(div_amount=dividend1, div_type=DividendType.ContinuousYield)
-Price(option, market, model)
-Price(forward, market, model)
-
-market.reset_div()
-d = market.div_convert(div_amount=delta, fr_type=DividendType.DiscreteProp, to_type=DividendType.DiscreteCash)
-dividend2 = np.zeros(360)
-dividend2[179] = d  # d = S0*e^(rt)*delta
-market.set_div(div_amount=dividend2, div_type=DividendType.DiscreteCash)
-Price(option, market, model)
-Price(forward, market, model)
-
-market.reset_div()
-dividend3 = np.zeros(360)
-dividend3[179] = delta
-market.set_div(div_amount=dividend3, div_type=DividendType.DiscreteProp)
-Price(option, market, model)
-Price(forward, market, model)'''
-
 market.set_div(div_amount=0.01, frequency=180, div_type=DividendType.ContinuousYield)
 
 K = 100
@@ -72,8 +39,6 @@ Price(forward, market, model)
 # discrete cash
 market.reset_div()
 d = market.div_convert(div_amount=delta, frequency=1, fr_type=DividendType.DiscreteProp, to_type=DividendType.DiscreteCash)
-'''dividend2 = np.zeros(360)
-dividend2[179] = d  # d = S0*e^(rt)*delta'''
 market.set_div(div_amount=d, frequency=1, div_type=DividendType.DiscreteCash)
 Price(option, market, model)
 Price(forward, market, model)
@@ -94,8 +59,6 @@ Price(forward, market, model)
 
 # discrete proportional
 market.reset_div()
-'''dividend3 = np.zeros(360)
-dividend3[179] = delta'''
 market.set_div(div_amount=delta, frequency=1, div_type=DividendType.DiscreteProp)
 Price(option, market, model)
 Price(forward, market, model)
@@ -188,11 +151,11 @@ np.save('./results/cash_dividend_m1_freq.npy', cash_dividend_freq)
 np.save('./results/cash_dividend_m2_freq.npy', cash_dividend_freq)
 np.save('./results/proportional_dividend_freq.npy', proportional_dividend_freq)
 
-plt.axis([-1,370,3,6])
+#plt.axis([-1,370,3,6])
 plt.plot(frequency, dividend_yield_freq, label='dividend_yield')
 plt.plot(frequency, cash_dividend_freq, label='cash_dividend')
-plt.plot(frequency, cash_dividend_m1_freq, label='cash_dividend_m1')
-plt.plot(frequency, cash_dividend_m2_freq, label='cash_dividend_m2')
+#plt.plot(frequency, cash_dividend_m1_freq, label='cash_dividend_m1')
+#plt.plot(frequency, cash_dividend_m2_freq, label='cash_dividend_m2')
 plt.plot(frequency, proportional_dividend_freq, label='proportional_dividend')
 plt.legend()
 plt.xlabel('dividend frequency')
@@ -202,20 +165,39 @@ plt.show()
 
 np.save('./results/dividend_yield_forward.npy', dividend_yield_forward)
 np.save('./results/cash_dividend_forward.npy', cash_dividend_forward)
-np.save('./results/cash_dividend_m1_forward.npy', cash_dividend_forward)
-np.save('./results/cash_dividend_m2_forward.npy', cash_dividend_forward)
+np.save('./results/cash_dividend_m1_forward.npy', cash_dividend_m1_forward)
+np.save('./results/cash_dividend_m2_forward.npy', cash_dividend_m2_forward)
 np.save('./results/proportional_dividend_forward.npy', proportional_dividend_forward)
 
-plt.axis([-1,370,95,105])
+#plt.axis([-1,370,95,105])
 plt.plot(frequency, dividend_yield_forward, label='dividend_yield_forward')
 plt.plot(frequency, cash_dividend_forward, label='cash_dividend_forward')
-plt.plot(frequency, cash_dividend_m1_forward, label='cash_dividend_m1_forward')
-plt.plot(frequency, cash_dividend_m2_forward, label='cash_dividend_m2_forward')
+#plt.plot(frequency, cash_dividend_m1_forward, label='cash_dividend_m1_forward')
+#plt.plot(frequency, cash_dividend_m2_forward, label='cash_dividend_m2_forward')
 plt.plot(frequency, proportional_dividend_forward, label='proportional_dividend_forward')
 plt.legend()
 plt.xlabel('dividend frequency')
 plt.ylabel('forward price')
 plt.savefig("./results/frequency-forward.png")
+plt.show()
+
+
+plt.plot(frequency, cash_dividend_freq, label='cash_dividend')
+plt.plot(frequency, cash_dividend_m1_freq, label='cash_dividend_m1')
+plt.plot(frequency, cash_dividend_m2_freq, label='cash_dividend_m2')
+plt.legend()
+plt.xlabel('dividend frequency')
+plt.ylabel('European call price (cash dividend)')
+plt.savefig("./results/frequency-price_cash.png")
+plt.show()
+
+plt.plot(frequency, cash_dividend_forward, label='cash_dividend_forward')
+plt.plot(frequency, cash_dividend_m1_forward, label='cash_dividend_m1_forward')
+plt.plot(frequency, cash_dividend_m2_forward, label='cash_dividend_m2_forward')
+plt.legend()
+plt.xlabel('dividend frequency')
+plt.ylabel('forward price (cash dividend)')
+plt.savefig("./results/frequency-forward_cash.png")
 plt.show()
 
 print(dividend_yield_freq)

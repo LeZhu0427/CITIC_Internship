@@ -49,30 +49,24 @@ class MonteCarlo(PricingModel):
 
         d1 = np.zeros(n_timestep)
         delta1 = np.zeros(n_timestep)
-        d_m1 = np.zeros(n_timestep)
-        d_m2 = np.zeros(n_timestep)
-        #print(q,d,d_model1,d_model2,delta)
         ST = np.array([S0] * self.n_path)  # S0
         if frequency!=0:
             dt = 360//frequency
             if d is not None:
                 for j in range(1,frequency+1):
                     d1[j*dt-1] = d
-                #print('frequency cash', frequency, sum(d1))
-                #d1[dt-1::dt] = np.ones(len(d1[dt-1::dt])) * d
             elif delta is not None:
                 for j in range(1,frequency+1):
                     delta1[j*dt-1] = delta / frequency
-                #print('frequency delta', frequency, sum(delta1))
             elif d_model1 is not None:
-                #ST = np.array([S0 - d_model1 * math.exp(-r * (T - t) / 360)] * self.n_path)  # S0
-                ST = np.array([S0 - d_model1 * math.exp(-r * (T - t))] * self.n_path)  # S0
+                discount_PV = 0
+                for j in range(1, frequency + 1):
+                    discount_PV += math.exp(-r * (j + 1) * dt)
+                ST = np.array([S0 - d_model1 * discount_PV] * self.n_path)  # S0
             elif d_model2 is not None:
                 dividend_FV = 0
                 for j in range(1, frequency + 1):
-                    #dividend_FV += math.exp(-r * (j + 1) * dt / 360)
                     dividend_FV += math.exp(-r * (j + 1) * dt)
-                #dividend_FV = dividend_FV * d_model2 * math.exp(t * (T-t)/360)
                 dividend_FV = dividend_FV * d_model2 * math.exp(r * (T - t))
 
         for i in range(0, T - t):
