@@ -17,7 +17,7 @@ class MarketData:
     def __init__(self, spot: float, vol: float, r: float):
         self.spot = spot
         self.vol = vol
-        self.r = r
+        self.r = r       # annual
         self.q = 0.0
         self.d = None
         self.delta = None
@@ -63,10 +63,12 @@ class MarketData:
                                                                    DividendType.DiscreteCash_m2):
             # same conversion for all cash dividend
             # TODO: remove hard code
-            dt = 360//frequency
+            '''dt = 360//frequency
             dt = dt/360
             return self.spot * (1 - pow(1 - div_amount / frequency, frequency)) * math.exp(self.r * dt) / (
-                1 - math.exp(-self.r * 1)) * (1 - math.exp(-self.r * dt))
+                1 - math.exp(-self.r * 1)) * (1 - math.exp(-self.r * dt))'''
+            return self.spot * (1 - pow(1 - div_amount / frequency, frequency)) * (1
+                - math.exp(-self.r * 1 / frequency)) / (1 - math.exp(-self.r * 1)) / math.exp(-self.r * 1/frequency)
 
         elif fr_type == DividendType.DiscreteProp and to_type == DividendType.ContinuousYield:
             # TODO: remove hard code
