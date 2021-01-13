@@ -31,6 +31,7 @@ mu = df['log_return'].mean()
 sigma = statistics.stdev(df['log_return'].dropna())
 sm.qqplot(df['log_return'].dropna(), stats.norm, loc=mu, scale=sigma, line ='45')   #stats.norm(loc=mu, scale=sigma)
 plt.show()
+plt.savefig("./results/QQPlot.png")
 
 # KS Test
 KS = stats.kstest(df['log_return'].dropna(), 'norm')
@@ -46,6 +47,18 @@ print('Skewness: ', skew)
 # Kurtosis
 kurtosis = stats.kurtosis(df['log_return'].dropna())
 print('Kurtosis: ', kurtosis)
+
+# Stationary
+# unit root
+# DF test
+# demean time series is white noise
+# Box-Ljung test
+# ACF
+
+#pd.set_option('display.max_columns', None)
+#print(df)
+#print(df.info())
+
 
 '''
            vol_21d   vol_63d  vol_126d  vol_189d
