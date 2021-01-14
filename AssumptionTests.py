@@ -5,7 +5,11 @@ import statsmodels.api as sm
 import matplotlib.pyplot as plt
 import scipy.stats as stats
 
-raw_data = pd.read_excel('./data/500_FUTURES.xls')
+file_name = '500_FUTURES'
+#file_name = '300_FUTURES'
+#file_name = '50_FUTURES'
+
+raw_data = pd.read_excel('./data/'+file_name+'.xls')
 df = raw_data.drop_duplicates(subset=['TRADE_DT', 'UNDERLYING_CLOSE_PRICE'], keep='first').reset_index(drop=True)
 df['log_return'] = np.log(df.UNDERLYING_CLOSE_PRICE) - np.log(df.UNDERLYING_CLOSE_PRICE.shift(-1))
 
@@ -30,7 +34,7 @@ print(corr_matrix)
 mu = df['log_return'].mean()
 sigma = statistics.stdev(df['log_return'].dropna())
 sm.qqplot(df['log_return'].dropna(), stats.norm, loc=mu, scale=sigma, line ='45')   #stats.norm(loc=mu, scale=sigma)
-plt.savefig("./results/QQPlot.png")
+plt.savefig("./results/QQPlot"+file_name+".png")
 plt.show()
 
 # KS Test
@@ -44,7 +48,7 @@ print('P value: ', KS[1])
 skew = stats.skew(df['log_return'].dropna())
 print('Skewness: ', skew)
 plt.hist(df['log_return'], bins=30)
-plt.savefig("./results/histogram.png")
+plt.savefig("./results/histogram"+file_name+".png")
 plt.show()
 
 # Kurtosis
