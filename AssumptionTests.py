@@ -30,8 +30,9 @@ print(corr_matrix)
 mu = df['log_return'].mean()
 sigma = statistics.stdev(df['log_return'].dropna())
 sm.qqplot(df['log_return'].dropna(), stats.norm, loc=mu, scale=sigma, line ='45')   #stats.norm(loc=mu, scale=sigma)
-plt.show()
 plt.savefig("./results/QQPlot.png")
+plt.show()
+
 
 # KS Test
 KS = stats.kstest(df['log_return'].dropna(), 'norm')
