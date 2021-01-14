@@ -33,7 +33,6 @@ sm.qqplot(df['log_return'].dropna(), stats.norm, loc=mu, scale=sigma, line ='45'
 plt.savefig("./results/QQPlot.png")
 plt.show()
 
-
 # KS Test
 KS = stats.kstest(df['log_return'].dropna(), 'norm')
 print()
@@ -44,6 +43,9 @@ print('P value: ', KS[1])
 # Skewness
 skew = stats.skew(df['log_return'].dropna())
 print('Skewness: ', skew)
+plt.hist(df['log_return'], bins=30)
+plt.savefig("./results/histogram.png")
+plt.show()
 
 # Kurtosis
 kurtosis = stats.kurtosis(df['log_return'].dropna())
