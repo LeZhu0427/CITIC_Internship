@@ -66,6 +66,7 @@ Price(forward, market, model)
 # compare ATM European call in 3 dividends
 # TODO: update this part
 frequency = [1,2,4,12,24,180,360]     # frequency n times per year
+#frequency = [1]
 dividend_yield_freq=[]
 cash_dividend_freq=[]
 proportional_dividend_freq=[]
@@ -181,9 +182,8 @@ plt.ylabel('forward price')
 plt.savefig("./results/frequency-forward.png")
 plt.show()
 
-
-plt.plot(frequency, cash_dividend_freq, label='cash_dividend')
 plt.plot(frequency, cash_dividend_m1_freq, marker='.', label='cash_dividend_m1')
+plt.plot(frequency, cash_dividend_freq, label='cash_dividend')
 plt.plot(frequency, cash_dividend_m2_freq, marker='x', label='cash_dividend_m2')
 plt.legend()
 plt.xlabel('dividend frequency')
@@ -191,8 +191,8 @@ plt.ylabel('European call price (cash dividend)')
 plt.savefig("./results/frequency-price_cash.png")
 plt.show()
 
-plt.plot(frequency, cash_dividend_forward, label='cash_dividend_forward')
 plt.plot(frequency, cash_dividend_m1_forward, marker='.', label='cash_dividend_m1_forward')
+plt.plot(frequency, cash_dividend_forward, label='cash_dividend_forward')
 plt.plot(frequency, cash_dividend_m2_forward, marker='x', label='cash_dividend_m2_forward')
 plt.legend()
 plt.xlabel('dividend frequency')

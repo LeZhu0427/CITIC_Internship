@@ -39,7 +39,8 @@ class MonteCarlo(PricingModel):
     def generate_discrete_data(self):
         self.path = np.ones((1, self.n_path)) * self.S0  # row 0: S0
         self.ST = np.ones(self.n_path) * self.S0  # S0
-        self.Wt = np.random.normalmtrand.RandomState(seed=42).randn(self.n_path, self.T - self.t)
+        #self.Wt = np.random.normalmtrand.RandomState(seed=42).randn(self.n_path, self.T - self.t)
+        self.Wt = np.random.normal(0, 1/math.sqrt(1/360), self.n_path*(self.T - self.t))
 
     def generate_ST(self, S0, vol, r, T, t, d, d_model1, d_model2, q, delta, frequency):
         # r is daily interest rate
@@ -71,8 +72,11 @@ class MonteCarlo(PricingModel):
                 dividend_FV = dividend_FV * d_model2 * math.exp(r * (T - t))
 
         for i in range(0, T - t):
-            dS = ST * (np.ones(self.n_path) * (r - q1[i]) + vol * self.Wt[i:i + self.n_path]) - np.ones(self.n_path) * d1[
-                i]  # daily increment
+            # i: time
+            '''dS = ST * (np.ones(self.n_path) * (r - q1[i]) + vol * self.Wt[i:i + self.n_path]) - np.ones(self.n_path) * d1[
+                i]  # daily increment'''
+            dS = ST * (np.ones(self.n_path) * (r - q1[i]) + vol * self.Wt[i*self.n_path:(i+1)*self.n_path]) - np.ones(self.n_path) * \
+                 d1[i]  # daily increment
             ST = (ST + dS) * (1 - delta1[i])  # discrete proportional dividend is paid at market close
             if min(ST) < 0:
                 print("cash divident: S", i, "<0")  # it the stock price is negative after paying dividend
