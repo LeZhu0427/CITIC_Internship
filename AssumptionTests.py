@@ -9,7 +9,7 @@ from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 
 file_name = '500_FUTURES'
 #file_name = '300_FUTURES'
-file_name = '50_FUTURES'
+#file_name = '50_FUTURES'
 
 raw_data = pd.read_excel('./data/'+file_name+'.xls')
 df = raw_data.drop_duplicates(subset=['TRADE_DT', 'UNDERLYING_CLOSE_PRICE'], keep='first').reset_index(drop=True)
@@ -88,7 +88,8 @@ plt.plot(df['TRADE_DT'], df['vol_21d'])
 mu_log = df['vol_21d'].mean()
 sigma_log = df['vol_21d'].std()
 sigma_normal = math.sqrt(math.log(sigma_log * sigma_log / mu_log / mu_log + 1))
-mu_normal = math.log(mu_log) - 0.5*sigma_normal*sigma_normal
+#mu_normal = math.log(mu_log) - 0.5*sigma_normal*sigma_normal
+mu_normal = math.log(mu_log) - 0.5*math.log(mu_log*mu_log/sigma_log*sigma_log+1)
 plt.plot(df['TRADE_DT'], np.ones(len(df['vol_21d'])) * mu_log, color='forestgreen', label='mean')
 plt.plot(df['TRADE_DT'], np.ones(len(df['vol_21d'])) * math.exp(mu_normal+1.96*sigma_normal), color='lightcoral', label='2 tails 95%')  # 2 tails 95%
 plt.plot(df['TRADE_DT'], np.ones(len(df['vol_21d'])) * math.exp(mu_normal-1.96*sigma_normal), color='lightcoral')
