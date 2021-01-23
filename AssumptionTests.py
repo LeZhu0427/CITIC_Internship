@@ -21,19 +21,31 @@ df.reset_index(inplace=True)
 df.drop(columns=['index'],inplace=True)
 
 # vol for n future days
-def historical_val(series, window):
+def historical_daily_val(series, window):
     result = [np.nan]*window
     for i in range(window, len(series)):
         result.append(statistics.stdev(series[i-window:i]))
     return result
 
-df['vol_21d'] = historical_val(df['log_return'],21)
-df['vol_63d'] = historical_val(df['log_return'],63)
-df['vol_126d'] = historical_val(df['log_return'],126)
-df['vol_189d'] = historical_val(df['log_return'],189)
+df['vol_21d'] = historical_daily_val(df['log_return'],21)
+df['vol_63d'] = historical_daily_val(df['log_return'],63)
+df['vol_126d'] = historical_daily_val(df['log_return'],126)
+df['vol_189d'] = historical_daily_val(df['log_return'],189)
+
+def historical_val(series, window):
+    result = [np.nan]*window
+    for i in range(window, len(series)):
+        #result.append(statistics.stdev(series[i-window:i]))
+        result.append(math.log((series[i]/series[i - window])))
+    return result
+
+df['ln(ST/S0)_21d'] = historical_val(df.UNDERLYING_CLOSE_PRICE, 21)
+df['ln(ST/S0)_63d'] = historical_val(df.UNDERLYING_CLOSE_PRICE, 63)
+df['ln(ST/S0)_126d'] = historical_val(df.UNDERLYING_CLOSE_PRICE, 126)
+df['ln(ST/S0)_189d'] = historical_val(df.UNDERLYING_CLOSE_PRICE, 189)
 
 # corrolation matrix
-corr_matrix = df[['vol_21d', 'vol_63d', 'vol_126d', 'vol_189d']].dropna().corr()
+corr_matrix = df[['ln(ST/S0)_21d', 'ln(ST/S0)_63d', 'ln(ST/S0)_126d', 'ln(ST/S0)_189d']].dropna().corr()
 print('corr_matrix')
 print(corr_matrix)
 
